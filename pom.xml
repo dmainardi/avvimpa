@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.mainardisoluzioni</groupId>
+    <artifactId>avvimpa</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <organization>
+        <name>Leva SpA</name>
+        <url>https://www.levaspa.com/</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Mainardi Davide</name>
+            <email>davide@mainardisoluzioni.com</email>
+            <organization>Mainardi Soluzioni</organization>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.21.2</version>
+        </dependency>
+    </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <exec.mainClass>com.mainardisoluzioni.avvimpa.Avvimpa</exec.mainClass>
+    </properties>
+    <name>Avvimpa</name>
+    <description>Avvita e stampa - Leva SpA</description>
+</project>
