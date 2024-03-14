@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.1.final utlizzo versione della libreria JasperReports6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="etichetta" pageWidth="85" pageHeight="34" orientation="Landscape" columnWidth="85" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="fdd03d1d-4023-4992-a77e-f63c080a2ecd">
+	<parameter name="identificativo" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
 	<detail>
 		<band height="34" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<staticText>
-				<reportElement x="0" y="0" width="85" height="34" uuid="5e627ca3-3921-4dac-b5cf-458c5a7ad9ac">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="20" width="85" height="14" uuid="f5021c13-6d72-480e-b93c-8c240dbbdeb8">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="6"/>
+					<font size="6" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Io sono MAINA e sono qui per fare tutto ciò che c'è da fare. Ancora una volta. Molto da fare, davvero molto.]]></text>
+				<textFieldExpression><![CDATA[$P{identificativo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="85" height="20" uuid="4cdd87da-426c-4ee4-89b7-c49ffaa8093a">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Avvitatura OK]]></text>
 			</staticText>
 		</band>
 	</detail>

@@ -16,7 +16,11 @@
  */
 package com.mainardisoluzioni.avvimpa;
 
+import com.fazecast.jSerialComm.SerialPort;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +54,7 @@ public class Avvimpa {
     public static void main(String[] args) {
 
         Avvimpa instance = new Avvimpa();
-        instance.stampaSuEtichettatrice("mainami");
+        //instance.stampaSuEtichettatrice("guainami");
 
         /*List<Object> tempBean = new ArrayList<>();
         tempBean.add(new Object());
@@ -63,25 +67,30 @@ public class Avvimpa {
         } catch (JRException ex) {
             Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
         }*/
-
-
-        /*SerialPort comPort = SerialPort.getCommPorts()[0];
+        SerialPort comPort = SerialPort.getCommPorts()[0];
         comPort.openPort();
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        InputStream in = comPort.getInputStream();
-        try {
-        for (int j = 0; j < 1000; ++j) {
-        System.out.print((char) in.read());
+        try (InputStream in = comPort.getInputStream()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                try {
+                    String subLine = line.substring(76);
+                    if (subLine.toLowerCase().contains("program end")) {
+                        System.out.println(subLine.substring(0, 17));
+                        instance.stampaSuEtichettatrice("guainami", subLine.substring(0, 17));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    // niente da fare
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
         }
-        in.close();
-        } catch (Exception e) {
-        e.printStackTrace();
-        }
-        comPort.closePort();*/
+        comPort.closePort();
     }
 
-    private InputStream getFileAsIOStream(final String fileName)
-    {
+    private InputStream getFileAsIOStream(final String fileName) {
         InputStream ioStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
 
         if (ioStream == null) {
@@ -90,17 +99,12 @@ public class Avvimpa {
         return ioStream;
     }
 
-    private void stampaSuEtichettatrice(String nomeEtichettatrice) {
+    private void stampaSuEtichettatrice(String nomeEtichettatrice, String identificativo) {
         if (nomeEtichettatrice != null && !nomeEtichettatrice.isBlank()) {
             PrintService printService = PrintUtility.findPrintService(nomeEtichettatrice);
             if (printService != null) {
                 try {
-                    JasperPrint jasperPrint = creaReport();
-
-                    PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
-                    printRequestAttributeSet.add(new MediaPrintableArea(0, 0, 1, 0.5f, MediaPrintableArea.INCH));
-                    printRequestAttributeSet.add(MediaSize.findMedia(1, 0.5f, MediaSize.INCH));
-                    printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
+                    JasperPrint jasperPrint = creaReport(identificativo);
 
                     PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
                     printServiceAttributeSet.add(printService.getAttribute(PrinterName.class));
@@ -109,29 +113,29 @@ public class Avvimpa {
                     exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
                     SimplePrintServiceExporterConfiguration configuration = new SimplePrintServiceExporterConfiguration();
 
-                    //configuration.setPrintRequestAttributeSet(printRequestAttributeSet);
                     configuration.setPrintServiceAttributeSet(printServiceAttributeSet);
                     configuration.setDisplayPageDialog(false);
                     configuration.setDisplayPrintDialog(false);
                     exporter.setConfiguration(configuration);
                     exporter.exportReport();
-                    
-                    JasperExportManager.exportReportToPdfFile(jasperPrint, "maina.pdf");
+
+                    //JasperExportManager.exportReportToPdfFile(jasperPrint, "maina.pdf");
                 } catch (JRException ex) {
                     Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
                     //Messages.create("error").error().detail(ex.getMessage()).add();
                 }
-            }
-            else
+            } else {
                 Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, "vendita.etichetta.stampa.errore.etichettatriceMancante");
-                //Messages.create("error").error().detail("vendita.etichetta.stampa.errore.etichettatriceMancante").add();
+            }
+            //Messages.create("error").error().detail("vendita.etichetta.stampa.errore.etichettatriceMancante").add();
         }
     }
 
-    private JasperPrint creaReport() throws JRException {
+    private JasperPrint creaReport(String identificativo) throws JRException {
         List<Object> tempBean = new ArrayList<>();
         Map<String, Object> params = new HashMap<>();
         params.put("ReportTitle", "Etichetta");
+        params.put("identificativo", identificativo);
         /*params.put("subReportPath", externalContext.getRealPath("/resources/documents/vendita/") + "/");
         params.put("reportImagePath", externalContext.getRealPath("/resources/documents/images/") + "/");*/
 
@@ -141,6 +145,5 @@ public class Avvimpa {
         InputStream inputStream = instance.getFileAsIOStream("documents/etichetta.jasper");
         return JasperFillManager.fillReport(inputStream, params, new JRBeanCollectionDataSource(tempBean));
     }
-
 
 }
