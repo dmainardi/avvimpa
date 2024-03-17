@@ -2,8 +2,14 @@
 Avvita e stampa
 
 ## Descrizione
-Ascolta la porta seriale in attesa di una riga che termina con "program end".
+Ascolta la porta seriale in attesa di una riga che termina con `program end`.
 A quel punto crea un PDF con la data e l'ora indicata sulla riga appena letta. Il PDF viene stampato sulla stampante indicata come parametro di avvio programma.
+
+## Prerequisiti
+### Sviluppo
+Sono necessari **Java Development Kit** e **Maven**.
+### Esecuzione
+È necessario **Java Runtime Environment**
 
 ## Build
 Eseguire
