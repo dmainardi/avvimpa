@@ -35,7 +35,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.mainardisoluzioni.avvimpa.Avvimpa</mainClass>
+                            <mainClass>com.mainardisoluzioni.avvimpa.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -45,7 +45,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.mainardisoluzioni.avvimpa.Avvimpa</mainClass>
+                            <mainClass>com.mainardisoluzioni.avvimpa.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

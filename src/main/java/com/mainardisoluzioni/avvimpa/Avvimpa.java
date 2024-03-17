@@ -44,11 +44,14 @@ import net.sf.jasperreports.export.SimplePrintServiceExporterConfiguration;
  * @author Davide Mainardi <davide@mainardisoluzioni.com>
  */
 public class Avvimpa {
+    
+    private final String nomeEtichettatrice;
 
-    public static void main(String[] args) {
-
-        Avvimpa instance = new Avvimpa();
-
+    public Avvimpa(String nomeEtichettatrice) {
+        this.nomeEtichettatrice = nomeEtichettatrice;
+    }
+    
+    public void ascoltaSullaSerialeEStampaEtichetta() {
         SerialPort comPort = SerialPort.getCommPorts()[0];
         comPort.openPort();
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
@@ -60,7 +63,7 @@ public class Avvimpa {
                     String subLine = line.substring(76);
                     if (subLine.toLowerCase().contains("program end")) {
                         //System.out.println(subLine.substring(0, 17));
-                        instance.stampaSuEtichettatrice("guainami", subLine.substring(0, 17));
+                        stampaSuEtichettatrice(nomeEtichettatrice, subLine.substring(0, 17));
                     }
                 } catch (IndexOutOfBoundsException e) {
                     // niente da fare
@@ -70,15 +73,6 @@ public class Avvimpa {
             Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
         }
         comPort.closePort();
-    }
-
-    private InputStream getFileAsIOStream(final String fileName) {
-        InputStream ioStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
-
-        if (ioStream == null) {
-            throw new IllegalArgumentException(fileName + " is not found");
-        }
-        return ioStream;
     }
 
     private void stampaSuEtichettatrice(String nomeEtichettatrice, String identificativo) {
@@ -119,8 +113,8 @@ public class Avvimpa {
 
         tempBean.add(new Object());
 
-        Avvimpa instance = new Avvimpa();
-        InputStream inputStream = instance.getFileAsIOStream("documents/etichetta.jasper");
+        ResourceFileHelper resourceFileHelper = new ResourceFileHelper();
+        InputStream inputStream = resourceFileHelper.getFileAsIOStream("documents/etichetta.jasper");
         return JasperFillManager.fillReport(inputStream, params, new JRBeanCollectionDataSource(tempBean));
     }
 
