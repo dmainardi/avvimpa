@@ -1,0 +1,13 @@
+[Unit]
+Description=Avvimpa start
+
+[Service]
+WorkingDirectory=/opt/avvimpa
+Type=simple
+ExecStart=/usr/lib/jvm/default-java/bin/java avvimpa.jar TOSHIBA-001
+User=adminavvimpa
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

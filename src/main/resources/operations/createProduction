@@ -1,0 +1,5 @@
+cp avvimpa.service /etc/systemd/system/
+mkdir 
+sudo chown -R adminavvimpa:adminavvimpa /opt/avvimpa
+sudo systemctl daemon-reload
+systemctl enable avvimpa
