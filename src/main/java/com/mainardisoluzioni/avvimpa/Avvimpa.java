@@ -52,27 +52,35 @@ public class Avvimpa {
     }
     
     public void ascoltaSullaSerialeEStampaEtichetta() {
-        SerialPort comPort = SerialPort.getCommPorts()[0];
-        comPort.openPort();
-        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        try (InputStream in = comPort.getInputStream()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                try {
-                    String subLine = line.substring(76);
-                    if (subLine.toLowerCase().contains("program end")) {
-                        //System.out.println(subLine.substring(0, 17));
-                        stampaSuEtichettatrice(nomeEtichettatrice, subLine.substring(0, 17));
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    // niente da fare
-                }
+        SerialPort comPort = null;
+        for (SerialPort commPortTemp : SerialPort.getCommPorts()) {
+            if (commPortTemp.getDescriptivePortName().toLowerCase().contains("usb")) {
+                comPort = commPortTemp;
+                break;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
         }
-        comPort.closePort();
+        if (comPort != null) {
+            comPort.openPort();
+            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+            try (InputStream in = comPort.getInputStream()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    try {
+                        String subLine = line.substring(76);
+                        if (subLine.toLowerCase().contains("program end")) {
+                            //System.out.println(subLine.substring(0, 17));
+                            stampaSuEtichettatrice(nomeEtichettatrice, subLine.substring(0, 17));
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        // niente da fare
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            comPort.closePort();
+        }
     }
 
     private void stampaSuEtichettatrice(String nomeEtichettatrice, String identificativo) {

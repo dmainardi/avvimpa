@@ -26,7 +26,7 @@ public class Main {
         if (args.length > 0)
             nomeEtichettatrice = args[0];
         else
-            nomeEtichettatrice = "guainami";
+            nomeEtichettatrice = "TOSHIBA-001";
 
         Avvimpa instance = new Avvimpa(nomeEtichettatrice);
         instance.ascoltaSullaSerialeEStampaEtichetta();
