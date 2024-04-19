@@ -60,6 +60,7 @@ public class Avvimpa {
             }
         }
         if (comPort != null) {
+            comPort.disableExclusiveLock();
             comPort.openPort();
             comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
             try (InputStream in = comPort.getInputStream()) {
