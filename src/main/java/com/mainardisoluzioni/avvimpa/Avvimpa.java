@@ -21,10 +21,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.PrintService;
@@ -51,45 +54,52 @@ public class Avvimpa {
         this.nomeEtichettatrice = nomeEtichettatrice;
     }
     
-    public void ascoltaSullaSerialeEStampaEtichetta() {
-        SerialPort comPort = null;
-        for (SerialPort commPortTemp : SerialPort.getCommPorts()) {
-            if (commPortTemp.getDescriptivePortName().toLowerCase().contains("usb")) {
-                comPort = commPortTemp;
-                break;
-            }
+    public void ascoltaSullaSerialeEStampaEtichetta(boolean ascoltaSeriale) {
+        if (!ascoltaSeriale) {
+            Scanner scan = new Scanner(System.in);
+            while (!scan.nextLine().equalsIgnoreCase("exit"))
+                stampaSuEtichettatrice(nomeEtichettatrice, "Operazione OK", DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss").format(LocalDateTime.now()));
         }
-        if (comPort != null) {
-            comPort.disableExclusiveLock();
-            comPort.openPort();
-            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-            try (InputStream in = comPort.getInputStream()) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    try {
-                        String subLine = line.substring(76);
-                        if (subLine.toLowerCase().contains("program end")) {
-                            //System.out.println(subLine.substring(0, 17));
-                            stampaSuEtichettatrice(nomeEtichettatrice, subLine.substring(0, 17));
-                        }
-                    } catch (IndexOutOfBoundsException e) {
-                        // niente da fare
-                    }
+        else {
+            SerialPort comPort = null;
+            for (SerialPort commPortTemp : SerialPort.getCommPorts()) {
+                if (commPortTemp.getDescriptivePortName().toLowerCase().contains("usb")) {
+                    comPort = commPortTemp;
+                    break;
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
             }
-            comPort.closePort();
+            if (comPort != null) {
+                comPort.disableExclusiveLock();
+                comPort.openPort();
+                comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+                try (InputStream in = comPort.getInputStream()) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        try {
+                            String subLine = line.substring(76);
+                            if (subLine.toLowerCase().contains("program end")) {
+                                //System.out.println(subLine.substring(0, 17));
+                                stampaSuEtichettatrice(nomeEtichettatrice, "Avvitatura OK", subLine.substring(0, 17));
+                            }
+                        } catch (IndexOutOfBoundsException e) {
+                            // niente da fare
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                comPort.closePort();
+            }
         }
     }
 
-    private void stampaSuEtichettatrice(String nomeEtichettatrice, String identificativo) {
+    private void stampaSuEtichettatrice(String nomeEtichettatrice, String operazione, String identificativo) {
         if (nomeEtichettatrice != null && !nomeEtichettatrice.isBlank()) {
             PrintService printService = PrintUtility.findPrintService(nomeEtichettatrice);
             if (printService != null) {
                 try {
-                    JasperPrint jasperPrint = creaReport(identificativo);
+                    JasperPrint jasperPrint = creaReport(operazione, identificativo);
 
                     PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
                     printServiceAttributeSet.add(printService.getAttribute(PrinterName.class));
@@ -114,11 +124,12 @@ public class Avvimpa {
         }
     }
 
-    private JasperPrint creaReport(String identificativo) throws JRException {
+    private JasperPrint creaReport(String operazione, String identificativo) throws JRException {
         List<Object> tempBean = new ArrayList<>();
         Map<String, Object> params = new HashMap<>();
         params.put("ReportTitle", "Etichetta");
         params.put("identificativo", identificativo);
+        params.put("operazione", operazione);
 
         tempBean.add(new Object());
 

@@ -23,12 +23,17 @@ package com.mainardisoluzioni.avvimpa;
 public class Main {
     public static void main(String[] args) {
         final String nomeEtichettatrice;
-        if (args.length > 0)
+        final boolean ascoltaSeriale;
+        if (args.length > 0) {
             nomeEtichettatrice = args[0];
-        else
+            ascoltaSeriale = args.length <= 1;
+        }
+        else {
             nomeEtichettatrice = "TOSHIBA-001";
+            ascoltaSeriale = true;
+        }
 
         Avvimpa instance = new Avvimpa(nomeEtichettatrice);
-        instance.ascoltaSullaSerialeEStampaEtichetta();
+        instance.ascoltaSullaSerialeEStampaEtichetta(ascoltaSeriale);
     }
 }
