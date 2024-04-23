@@ -1,10 +1,12 @@
 [Unit]
-Description=Avvimpa start
+Description=Avvimpa managing service
 
 [Service]
 WorkingDirectory=/opt/avvimpa
 Type=simple
 ExecStart=/usr/lib/jvm/default-java/bin/java -jar avvimpa.jar TOSHIBA-001
+ExecStop=/bin/kill -15 $MAINPID
+SuccessExitStatus=143
 User=adminavvimpa
 Restart=on-failure
 RestartSec=10
