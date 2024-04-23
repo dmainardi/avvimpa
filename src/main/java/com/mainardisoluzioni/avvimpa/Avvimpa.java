@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.PrintService;
@@ -54,28 +53,29 @@ public class Avvimpa {
         this.nomeEtichettatrice = nomeEtichettatrice;
     }
     
-    public void ascoltaSullaSerialeEStampaEtichetta(boolean ascoltaSeriale) {
-        if (!ascoltaSeriale) {
-            Scanner scan = new Scanner(System.in);
-            while (!scan.nextLine().equalsIgnoreCase("exit"))
-                stampaSuEtichettatrice(nomeEtichettatrice, "Operazione OK", DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss").format(LocalDateTime.now()));
-        }
-        else {
-            SerialPort comPort = null;
-            for (SerialPort commPortTemp : SerialPort.getCommPorts()) {
-                if (commPortTemp.getDescriptivePortName().toLowerCase().contains("usb")) {
-                    comPort = commPortTemp;
-                    break;
-                }
+    public void ascoltaSullaSerialeEStampaEtichetta() {
+        boolean isBarcode = false;
+        SerialPort comPort = null;
+        for (SerialPort commPortTemp : SerialPort.getCommPorts()) {
+            String portName = commPortTemp.getDescriptivePortName().toLowerCase();
+            if (portName.contains("usb") || portName.contains("barcode")) {
+                comPort = commPortTemp;
+                if (portName.contains("barcode"))
+                    isBarcode = true;
+                break;
             }
-            if (comPort != null) {
-                comPort.disableExclusiveLock();
-                comPort.openPort();
-                comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-                try (InputStream in = comPort.getInputStream()) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
+        }
+        if (comPort != null) {
+            comPort.disableExclusiveLock();
+            comPort.openPort();
+            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+            try (InputStream in = comPort.getInputStream()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (isBarcode)
+                        stampaSuEtichettatrice(nomeEtichettatrice, line + " OK", DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss").format(LocalDateTime.now()));
+                    else {
                         try {
                             String subLine = line.substring(76);
                             if (subLine.toLowerCase().contains("program end")) {
@@ -86,11 +86,11 @@ public class Avvimpa {
                             // niente da fare
                         }
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                comPort.closePort();
+            } catch (IOException ex) {
+                Logger.getLogger(Avvimpa.class.getName()).log(Level.SEVERE, null, ex);
             }
+            comPort.closePort();
         }
     }
 
