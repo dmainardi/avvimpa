@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mainardisoluzioni</groupId>
     <artifactId>avvimpa</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
