@@ -73,7 +73,6 @@ public class Avvimpa {
             comPortBar.disableExclusiveLock();
             comPortBar.openPort();
             comPortBar.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-            int qtaEtichette = 1;
             try (InputStream inBar = comPortBar.getInputStream()) {
                 BufferedReader readerBar = new BufferedReader(new InputStreamReader(inBar));
                 String lineBar;
@@ -93,7 +92,7 @@ public class Avvimpa {
                                     if (subLineAvv.toLowerCase().contains("program end")) {
                                         stampaSuEtichettatrice(
                                                 nomeEtichettatrice,
-                                                qtaEtichette,
+                                                1,
                                                 valoreCodiceABarre + " OK",
                                                 subLineAvv.substring(0, 17)
                                         );
@@ -127,9 +126,6 @@ public class Avvimpa {
             comPortBar.closePort();
         }
     }
-
-
-
 
     private void stampaSuEtichettatrice(String nomeEtichettatrice, int qtaEtichette, String operazione, String identificativo) {
         if (nomeEtichettatrice != null && !nomeEtichettatrice.isBlank()) {
